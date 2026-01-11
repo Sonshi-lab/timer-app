@@ -154,7 +154,7 @@ export function MoonPhase({ progress, className = "" }: Props) {
                     width={320}
                     height={320}
                     className="object-contain"
-                    style={{ maskImage: "url(#moon-mask)", WebkitMaskImage: "url(#moon-mask)", maskMode: "alpha" }}
+                    style={{ maskImage: "url(#moon-mask)", WebkitMaskImage: "url(#moon-mask)", maskMode: "luminance" }}
                 />
                 <div className="absolute inset-0 rounded-full border border-zinc-800/30 pointer-events-none" />
             </div>

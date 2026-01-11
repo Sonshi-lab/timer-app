@@ -33,7 +33,7 @@ export function useTasks() {
 
     const addTask = (title: string) => {
         const newTask: Task = {
-            id: crypto.randomUUID(),
+            id: Date.now().toString(36) + Math.random().toString(36).substr(2),
             title,
             completed: false,
             timeLeft: 25 * 60, // Default 25 minutes

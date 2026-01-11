@@ -17,7 +17,7 @@ export default function Home() {
     const activeTask = tasks.find(t => t.id === activeTaskId);
 
     // Timer hook
-    const { timeLeft, isRunning, toggleTimer, reset, setTime, pause, progress } = useTimer();
+    const { timeLeft, isRunning, toggleTimer, reset, setTime, pause, progress, mode } = useTimer();
 
     // Update task time when timer ticks
     useEffect(() => {
@@ -64,7 +64,7 @@ export default function Home() {
     if (!isLoaded) return <div className="min-h-screen bg-black" />;
 
     return (
-        <main className="flex flex-col h-screen max-w-md mx-auto p-6 relative overflow-hidden bg-black text-zinc-50 font-sans selection:bg-emerald-500/30">
+        <main className="flex flex-col h-screen max-w-md mx-auto p-6 relative overflow-y-auto bg-black text-zinc-50 font-sans selection:bg-emerald-500/30">
             {/* Top Bar (Logo/Menu placeholder) */}
             <header className="flex justify-between items-center py-4 opacity-50">
                 {/* Minimal Content */}
@@ -72,7 +72,7 @@ export default function Home() {
             </header>
 
             {/* Main Content: Timer & Active Task */}
-            <div className="flex-1 flex flex-col justify-center items-center gap-8">
+            <div className="flex-1 flex flex-col justify-center items-center gap-8 shrink-0 py-8">
 
                 {/* Moon Phase & Timer Display */}
                 <div className="relative flex items-center justify-center">
@@ -83,8 +83,16 @@ export default function Home() {
                     </div>
 
                     {/* Timer Text Overlaid */}
-                    <div className="absolute inset-0 flex items-center justify-center z-10">
-                        <h1 className="text-8xl font-bold font-mono tracking-tighter tabular-nums leading-none select-none text-yellow-300 drop-shadow-lg">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
+                        {mode === 'intermission' && (
+                            <span className="text-2xl font-bold tracking-widest uppercase text-blue-400 drop-shadow-lg mb-2 animate-pulse">
+                                Intermission
+                            </span>
+                        )}
+                        <h1 className={clsx(
+                            "text-8xl font-bold font-mono tracking-tighter tabular-nums leading-none select-none drop-shadow-lg transition-colors duration-500",
+                            mode === 'intermission' ? "text-blue-400" : "text-yellow-300"
+                        )}>
                             {formatTime(timeLeft)}
                         </h1>
                     </div>
@@ -131,90 +139,93 @@ export default function Home() {
             </div>
 
             {/* Bottom Section: Task List & Add */}
-            <div className="flex flex-col gap-6 mt-auto pb-8 z-10">
-                {/* Add Task Input */}
-                <div className="relative group">
-                    <input
-                        type="text"
-                        placeholder="Add a new task..."
-                        className="w-full bg-zinc-900/50 border border-zinc-800 text-zinc-100 placeholder-zinc-600 rounded-xl px-4 py-4 pr-12 focus:outline-none focus:border-zinc-700 focus:bg-zinc-900 transition-all font-medium"
-                        onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                                addTask(e.currentTarget.value);
-                                e.currentTarget.value = "";
-                            }
-                        }}
-                    />
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-600 pointer-events-none">
-                        <Plus className="w-5 h-5" />
+            <div className="flex flex-col gap-6 pb-8 z-10 flex-1 min-h-0 shrink-0">
+                {/* Local Tasks Container */}
+                <div className="flex flex-col gap-6 w-full">
+                    {/* Add Task Input */}
+                    <div className="relative group">
+                        <input
+                            type="text"
+                            placeholder="Add a new task..."
+                            className="w-full bg-zinc-900/50 border border-zinc-800 text-zinc-100 placeholder-zinc-600 rounded-xl px-4 py-4 pr-12 focus:outline-none focus:border-zinc-700 focus:bg-zinc-900 transition-all font-medium"
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    addTask(e.currentTarget.value);
+                                    e.currentTarget.value = "";
+                                }
+                            }}
+                        />
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-600 pointer-events-none">
+                            <Plus className="w-5 h-5" />
+                        </div>
+                    </div>
+
+                    {/* Task List (Scrollable if many) */}
+                    <div className="space-y-2 w-full">
+                        {tasks.map(task => (
+                            <div
+                                key={task.id}
+                                onClick={() => handleSelectTask(task)}
+                                className={clsx(
+                                    "group flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all border",
+                                    activeTaskId === task.id ? "bg-zinc-900 border-zinc-800" : "bg-transparent border-transparent hover:bg-zinc-900/30",
+                                    task.completed && "opacity-40"
+                                )}
+                            >
+                                <div className="flex items-center gap-3 flex-1 min-w-0">
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            toggleTask(task.id);
+                                        }}
+                                        className={clsx(
+                                            "shrink-0 transition",
+                                            task.completed ? "text-emerald-500" : "text-zinc-700 hover:text-zinc-500"
+                                        )}
+                                    >
+                                        {task.completed ? (
+                                            <CheckCircle2 className="w-5 h-5" />
+                                        ) : (
+                                            <Circle className="w-5 h-5" />
+                                        )}
+                                    </button>
+                                    <span className={clsx(
+                                        "truncate font-medium transition",
+                                        task.completed ? "line-through text-zinc-600" : "text-zinc-400 group-hover:text-zinc-200",
+                                        activeTaskId === task.id && "text-zinc-100"
+                                    )}>
+                                        {task.title}
+                                    </span>
+                                </div>
+
+                                <div className="flex items-center gap-4">
+                                    <span className="text-xs font-mono text-zinc-600">
+                                        {formatTimeForCard(task.timeLeft || 25 * 60)}
+                                    </span>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            deleteTask(task.id);
+                                        }}
+                                        className="opacity-0 group-hover:opacity-100 text-zinc-600 hover:text-red-900 transition"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                        {tasks.length === 0 && (
+                            <p className="text-center text-zinc-700 text-sm py-2">No tasks yet.</p>
+                        )}
                     </div>
                 </div>
 
-                {/* Task List (Scrollable if many) */}
-                <div className="space-y-2 max-h-[25vh] overflow-y-auto pr-1 custom-scrollbar">
-                    {tasks.map(task => (
-                        <div
-                            key={task.id}
-                            onClick={() => handleSelectTask(task)}
-                            className={clsx(
-                                "group flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all border",
-                                activeTaskId === task.id ? "bg-zinc-900 border-zinc-800" : "bg-transparent border-transparent hover:bg-zinc-900/30",
-                                task.completed && "opacity-40"
-                            )}
-                        >
-                            <div className="flex items-center gap-3 flex-1 min-w-0">
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        toggleTask(task.id);
-                                    }}
-                                    className={clsx(
-                                        "shrink-0 transition",
-                                        task.completed ? "text-emerald-500" : "text-zinc-700 hover:text-zinc-500"
-                                    )}
-                                >
-                                    {task.completed ? (
-                                        <CheckCircle2 className="w-5 h-5" />
-                                    ) : (
-                                        <Circle className="w-5 h-5" />
-                                    )}
-                                </button>
-                                <span className={clsx(
-                                    "truncate font-medium transition",
-                                    task.completed ? "line-through text-zinc-600" : "text-zinc-400 group-hover:text-zinc-200",
-                                    activeTaskId === task.id && "text-zinc-100"
-                                )}>
-                                    {task.title}
-                                </span>
-                            </div>
-
-                            <div className="flex items-center gap-4">
-                                <span className="text-xs font-mono text-zinc-600">
-                                    {formatTimeForCard(task.timeLeft || 25 * 60)}
-                                </span>
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        deleteTask(task.id);
-                                    }}
-                                    className="opacity-0 group-hover:opacity-100 text-zinc-600 hover:text-red-900 transition"
-                                >
-                                    <Trash2 className="w-4 h-4" />
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                    {tasks.length === 0 && (
-                        <p className="text-center text-zinc-700 text-sm py-2">No tasks yet.</p>
-                    )}
+                {/* Google Tasks Overlay/Section */}
+                <div className="flex-none">
+                    <GoogleTasksList onSelectTask={(title) => {
+                        addTask(title);
+                    }} />
                 </div>
-            </div>
-
-            {/* Google Tasks Overlay/Section */}
-            <div className="mt-4">
-                <GoogleTasksList onSelectTask={(title) => {
-                    addTask(title);
-                }} />
             </div>
         </main>
     );
