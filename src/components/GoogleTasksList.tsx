@@ -55,13 +55,13 @@ export function GoogleTasksList({ onSelectTask }: Props) {
     }
 
     return (
-        <div className="mt-8 w-full max-w-md bg-gray-900/50 rounded-3xl p-6 backdrop-blur-sm border border-gray-800">
-            <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-gray-200">
-                Google Tasks <span className="text-xs bg-gray-800 px-2 py-0.5 rounded-full text-gray-400">{tasks.length}</span>
+        <div className="w-full max-w-md bg-black rounded-3xl p-6 border border-zinc-800 mt-8">
+            <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-white">
+                Google Tasks <span className="text-xs bg-zinc-900 px-2 py-0.5 rounded-full text-zinc-400">{tasks.length}</span>
             </h3>
 
             {error ? (
-                <div className="text-red-400 text-sm text-center py-4 bg-red-900/20 rounded-xl p-4">
+                <div className="text-red-400 text-sm text-center py-4 bg-red-900/10 rounded-xl p-4">
                     <p className="font-bold mb-1">Error fetching tasks:</p>
                     <p>{error}</p>
                     <button
@@ -72,20 +72,20 @@ export function GoogleTasksList({ onSelectTask }: Props) {
                     </button>
                 </div>
             ) : loading ? (
-                <div className="text-gray-500 text-center py-4">Loading tasks...</div>
+                <div className="text-zinc-500 text-center py-4">Loading tasks...</div>
             ) : (
                 <div className="space-y-3 max-h-[30vh] overflow-y-auto pr-1 custom-scrollbar">
                     {tasks.length === 0 && (
-                        <div className="text-center text-gray-500 py-4">No tasks found in default list.</div>
+                        <div className="text-center text-zinc-500 py-4">No tasks found in default list.</div>
                     )}
                     {tasks.map((task) => (
                         <div
                             key={task.id}
-                            className="group flex items-center justify-between p-4 rounded-xl bg-gray-800/30 hover:bg-gray-800 cursor-pointer transition border border-transparent hover:border-gray-700"
+                            className="group flex items-center justify-between p-4 rounded-xl bg-black hover:bg-zinc-900 cursor-pointer transition border border-zinc-900 hover:border-zinc-700"
                             onClick={() => onSelectTask(task.title)}
                         >
                             <span className="truncate flex-1 font-medium text-gray-300 group-hover:text-white transition">{task.title}</span>
-                            <button className="p-2 rounded-full bg-orange-600/10 text-orange-500 opacity-0 group-hover:opacity-100 transition hover:bg-orange-600 hover:text-white">
+                            <button className="p-2 rounded-full bg-emerald-500/10 text-emerald-500 opacity-0 group-hover:opacity-100 transition hover:bg-emerald-500 hover:text-emerald-950">
                                 <Play className="w-4 h-4 ml-0.5" />
                             </button>
                         </div>

@@ -65,6 +65,8 @@ export function useTimer(initialTime = WORK_TIME) {
         return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
     };
 
+    const toggleTimer = () => setIsRunning(prev => !prev);
+
     return {
         timeLeft,
         setTime: setTimeLeft,
@@ -72,6 +74,7 @@ export function useTimer(initialTime = WORK_TIME) {
         start,
         pause,
         reset,
+        toggleTimer,
         formattedTime: formatTime(timeLeft),
         progress: ((initialTime - timeLeft) / initialTime) * 100
     };
