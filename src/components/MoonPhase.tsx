@@ -122,9 +122,8 @@ export function MoonPhase({ progress, className = "" }: Props) {
                 <defs>
                     <mask id="moon-mask" maskContentUnits="objectBoundingBox">
                         {/* We need normalized coordinates 0-1 for objectBoundingBox */}
-                        <rect x="0" y="0" width="1" height="1" fill="black" />
-                        {/* We need to transform our 0-100 logic to 0-1 */}
-                        {/* Or just use userSpaceOnUse with the pixel size, but responsive is harder. */}
+                        {/* REMOVED black rect to support Alpha masking (Safari default). Transparent = Hidden, White = Visible. */}
+
                         {/* Let's try to convert the path to 0-1 coords. center 0.5, radius 0.5 */}
                         {(() => {
                             const cx = 0.5;
@@ -154,7 +153,13 @@ export function MoonPhase({ progress, className = "" }: Props) {
                     width={320}
                     height={320}
                     className="object-contain"
-                    style={{ maskImage: "url(#moon-mask)", WebkitMaskImage: "url(#moon-mask)", maskMode: "luminance" }}
+                    style={{
+                        maskImage: "url(#moon-mask)",
+                        WebkitMaskImage: "url(#moon-mask)",
+                        maskRepeat: "no-repeat",
+                        WebkitMaskRepeat: "no-repeat",
+                        // Removed maskMode: "luminance" to fallback to Alpha (works on Safari) 
+                    }}
                 />
                 <div className="absolute inset-0 rounded-full border border-zinc-800/30 pointer-events-none" />
             </div>
