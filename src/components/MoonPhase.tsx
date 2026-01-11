@@ -59,26 +59,28 @@ export function MoonPhase({ progress, className = "" }: Props) {
     return (
         <div className={`relative ${className} select-none`}>
             {/* The Full Moon Image (Always visible background) */}
-            <div className="relative inline-block">
-                <Image
+            <div className="relative inline-block w-[320px] h-[320px]">
+                {/* Standard img tag for maximum compatibility */}
+                <img
                     src="/full_moon.png"
                     alt="Moon Phase"
                     width={320}
                     height={320}
-                    className="object-contain"
-                    priority
+                    className="object-contain w-full h-full"
                 />
 
                 {/* Shadow Overlay */}
+                {/* No mix-blend-mode, just semi-transparent black for bulletproof rendering */}
                 <svg
                     viewBox="0 0 100 100"
-                    className="absolute inset-0 w-full h-full pointer-events-none mix-blend-multiply"
+                    className="absolute inset-0 w-full h-full pointer-events-none"
+                    style={{ zIndex: 10 }}
                 >
-                    <path d={d} fill="black" className="opacity-85" />
+                    <path d={d} fill="rgba(0,0,0,0.85)" />
                 </svg>
 
                 {/* Border Overlay */}
-                <div className="absolute inset-0 rounded-full border border-zinc-800/30 pointer-events-none" />
+                <div className="absolute inset-0 rounded-full border border-zinc-800/30 pointer-events-none" style={{ zIndex: 20 }} />
             </div>
         </div>
     );
